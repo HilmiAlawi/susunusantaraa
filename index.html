@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <!-- (Semua head CSS/Meta tetap sama seperti kode Anda) -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Dashboard - Vercel Version</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* (Gunakan style CSS yang sama dari file index.html asli Anda) */
+        :root { --glass-border: 1px solid rgba(255, 255, 255, 0.2); --glass-bg: rgba(255, 255, 255, 0.95); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f0f4f8; color: #1e293b; }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.6); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        #loadingOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <!-- (Salin seluruh tag <body> dari file index.html asli Anda sampai sebelum tag <script> logika) -->
+    <div id="loadingOverlay">
+        <div class="w-20 h-20 border-4 border-t-blue-600 rounded-full animate-spin"></div>
+        <p class="mt-4 font-bold text-slate-600">MENGAMBIL DATA DARI GOOGLE SHEETS...</p>
+    </div>
+
+    <!-- MAIN CONTENT (Sama seperti kode asli Anda) -->
+    <!-- ... -->
+
+    <script>
+        // --- MODIFIKASI PENTING UNTUK VERCEL ---
+        // Ganti URL ini dengan URL Web App (Deploy) dari Google Apps Script Anda
+        const GAS_API_URL = "ISI_DENGAN_URL_WEB_APP_GOOGLE_ANDA"; 
+
+        let rawData = {};
+        const fRupiah = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n || 0);
+        const fNum = (n) => new Intl.NumberFormat('id-ID').format(n || 0);
+        let charts = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchData();
+        });
+
+        async function fetchData() {
+            try {
+                // Mengambil data via Fetch API (karena google.script.run tidak ada di Vercel)
+                const response = await fetch(`${GAS_API_URL}?action=getData`);
+                const data = await response.json();
+                onDataLoaded(data);
+            } catch (err) {
+                console.error("Gagal mengambil data:", err);
+                document.getElementById('loadingOverlay').innerHTML = `<p class="text-red-500 font-bold">Error: Pastikan URL Web App Benar & Izin Publik Aktif</p>`;
+            }
+        }
+
+        function onDataLoaded(data) {
+            rawData = data;
+            document.getElementById('loadingOverlay').classList.add('opacity-0', 'pointer-events-none');
+            populateRegionFilter();
+            applyGlobalFilters();
+            renderSPPG(rawData.sppg, 'all'); 
+            filterMijelData(); 
+        }
+
+        // (Sisanya fungsi populateRegionFilter, updateUI, dll sama persis dengan kode asli Anda)
+        // ...
+    </script>
+</body>
+</html>
